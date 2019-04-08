@@ -1,7 +1,7 @@
 #include <Arduino.h>
+#include "paledefs.h"
+
  
-#define KEYBOARD_DATA 32
-#define KEYBOARD_CLK  33
 
 unsigned int shift = 0;
 byte lastcode  = 0;

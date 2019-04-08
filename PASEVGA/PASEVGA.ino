@@ -22,22 +22,6 @@
 //#define DEBUG
 bool run_debug = false;
 
-// ____________________________________________________________________
-// PINOUT DEFINITIONS
-//
-
-#define KEYBOARD_DATA 34
-#define KEYBOARD_CLK  35
-
-const int redPin = 14;
-const int greenPin = 19;
-const int bluePin = 27;
-const int hsyncPin = 32;
-const int vsyncPin = 33;
-
-#define DEBUG_PIN 2
-#define DEBUG_PIN2 2
-
 
 
 // ____________________________________________________________________
@@ -95,10 +79,11 @@ void setup()
   
   //we need double buffering for smooth animations
   vga.setFrameBufferCount(2);
-  //initializing i2s vga (with only one framebuffer)
-  vga.init(vga.MODE320x240.custom(256, 192), redPin, greenPin, bluePin, hsyncPin, vsyncPin);
   
-  //kb_begin();
+  //initializing i2s vga (with only one framebuffer)
+  vga.init(vga.MODE320x200.custom(256, 192), redPin, greenPin, bluePin, hsyncPin, vsyncPin);
+  
+  kb_begin();
   
   Serial.begin(115200);
 
@@ -137,6 +122,8 @@ xMutex = xSemaphoreCreateMutex();
                       0,          /* Priority of the task */
                       NULL,       /* Task handle. */
                       0);  /* Core where the task should run */
+  
+  // Comment this line lo boot spectrum  ROM
   load_speccy();
 
 
@@ -181,7 +168,8 @@ void videoTask( void * parameter )
     
             }
           }
-        } 
+        }
+         vga.show(); 
         //digitalWrite(DEBUG_PIN,LOW);
         xSemaphoreGive( xMutex ); 
         vTaskDelay(1) ;
@@ -232,11 +220,11 @@ void loop()
 {
   while (1) 
   { 
-        //do_keyboard();
+        do_keyboard();
         xSemaphoreTake( xMutex, portMAX_DELAY );
-  digitalWrite(DEBUG_PIN2,HIGH);
+        //digitalWrite(DEBUG_PIN2,HIGH);
              Z80_Execute();
-   digitalWrite(DEBUG_PIN2,LOW);
+        //digitalWrite(DEBUG_PIN2,LOW);
         xSemaphoreGive( xMutex );
         start_im1_irq=1;    // keyboard scan is run in IM1 interrupt
         vTaskDelay(1) ;  //important to avoid task watchdog timeouts - change this to slow down emu
