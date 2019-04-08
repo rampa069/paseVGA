@@ -29,8 +29,11 @@ void kb_interruptHandler()
           else
           {
             keymap[data] = 1;
+            Serial.print(keymap[data]);
             keyup = false;
           }
+          Serial.print(keymap[data]);
+
     }
 }
 

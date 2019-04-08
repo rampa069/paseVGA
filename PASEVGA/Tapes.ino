@@ -75,16 +75,18 @@ Z80_Regs i;
         return;
     }
     
-  // open a file for input      
- // lhandle = SPIFFS.open("/AirRaid.tap", FILE_READ);
- // lhandle = SPIFFS.open("/FloydsBank .tap", FILE_READ);
+ // open a file for input      
+//  lhandle = SPIFFS.open("/AirRaid.tap", FILE_READ);
+//  lhandle = SPIFFS.open("/FloydsBank .tap", FILE_READ);
 //  lhandle = SPIFFS.open("/OhMummy.tap", FILE_READ);
-  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
+lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
+//
 //  lhandle = SPIFFS.open("/jetpac.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/atic.sna", FILE_READ);
- // lhandle = SPIFFS.open("/sabre.sna", FILE_READ);
- // lhandle = SPIFFS.open("/underw.sna", FILE_READ);
-// lhandle = SPIFFS.open("/alien8.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/sabre.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/underw.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/alien8.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/emerald.sna", FILE_READ);
 
   size_read=0;
@@ -171,15 +173,22 @@ Z80_Regs i;
     //   unsigned int retaddr = bank1[(i.SP.D >>16) - 0x4000];
     uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
   
-     Serial.println("sp before");
+     Serial.print("sp before");
      Serial.println((uint16_t) i.SP.D, HEX);
     i.SP.D++;
     i.SP.D++;
-     Serial.println("sp after");
+     Serial.print("sp after");
      Serial.println((uint16_t) i.SP.D, HEX);
-    i.PC.D = 0x8400; //retaddr;  //0x7c19;  // 0x8400;  //manic miner is 0x8400   // 0x6000; atic atac doesnt run properly
-    Serial.println("retn address");
+     
+    i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
+    i.PC.D = 24288;
+    //i.PC.D= 0x6000;
+    //i.PC.D=retaddr;
+    Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
+
+    Serial.print ("Calculated PC: ");
+    Serial.println(i.PC.D, HEX);
 
     Z80_SetRegs (&i);
   }

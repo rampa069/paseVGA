@@ -1,10 +1,10 @@
 
 
 //#define IS_SPECCY
-#define SOUND_PIN 26
+#define SOUND_PIN 34
 
-#define KEYBOARD_DATA 34
-#define KEYBOARD_CLK  35
+#define KEYBOARD_DATA 25
+#define KEYBOARD_CLK  26
 
 const int redPin = 14;
 const int greenPin = 19;
