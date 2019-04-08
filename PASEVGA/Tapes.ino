@@ -56,10 +56,10 @@ extern void Z80_SetRegs (Z80_Regs *Regs);
 void load_speccy()
 {
   File  lhandle,lhandle2;
-  unsigned int  buf_p=0,quot=0,size_read,load_address;
+  uint16_t  buf_p=0,quot=0,size_read,load_address;
   unsigned char csum,flag_byte,header_byte1;
-  unsigned int cdd,f,ret,blocksize,data_leng,param1;
-  unsigned int tap_leng,exec_address, buf_pale;
+  uint16_t cdd,f,ret,blocksize,data_leng,param1;
+  uint16_t tap_leng,exec_address, buf_pale;
   char csum_ok[10];
 int tape_type = 0;
 //  pump_string("mload\"\"\x0d");
@@ -71,21 +71,21 @@ Z80_Regs i;
   Serial.println(system_get_free_heap_size());
  
   if(!SPIFFS.begin()){
-        Serial.println("Card Mount Failed");
+        Serial.println("Internal memory Mount Failed");
         return;
     }
     
   // open a file for input      
- // lhandle = SD.open("/AirRaid.tap", FILE_READ);
- // lhandle = SD.open("/FloydsBank .tap", FILE_READ);
-//  lhandle = SD.open("/OhMummy.tap", FILE_READ);
+ // lhandle = SPIFFS.open("/AirRaid.tap", FILE_READ);
+ // lhandle = SPIFFS.open("/FloydsBank .tap", FILE_READ);
+//  lhandle = SPIFFS.open("/OhMummy.tap", FILE_READ);
   lhandle = SPIFFS.open("/manic.sna", FILE_READ);
-//  lhandle = SD.open("/jetpac.sna", FILE_READ);
-//  lhandle = SD.open("/atic.sna", FILE_READ);
- // lhandle = SD.open("/sabre.sna", FILE_READ);
- // lhandle = SD.open("/underw.sna", FILE_READ);
-// lhandle = SD.open("/alien8.sna", FILE_READ);
-//  lhandle = SD.open("/emerald.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/jetpac.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/atic.sna", FILE_READ);
+ // lhandle = SPIFFS.open("/sabre.sna", FILE_READ);
+ // lhandle = SPIFFS.open("/underw.sna", FILE_READ);
+// lhandle = SPIFFS.open("/alien8.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/emerald.sna", FILE_READ);
 
   size_read=0;
   if(lhandle!=NULL)
@@ -114,7 +114,7 @@ Z80_Regs i;
     i.IX.B.h=lhandle.read();
 
     byte inter =lhandle.read();
-  Serial.println("inter address: ");
+  Serial.print("inter address: ");
     Serial.println((unsigned int)inter, HEX);
     if(inter & 0x04 == 0)
         i.IFF2 = 0;
@@ -122,43 +122,43 @@ Z80_Regs i;
         i.IFF2 = 1;
 
     i.R =lhandle.read();
- Serial.println("R : ");
-    Serial.println((unsigned int)i.R, HEX);
+ Serial.print("R : ");
+    Serial.println((uint8_t)i.R, HEX);
  
     i.AF.B.l=lhandle.read();
     i.AF.B.h=lhandle.read();
- Serial.println("AF : ");
-    Serial.println((unsigned int)i.AF.B.l, HEX);
+ Serial.print("AF : ");
+    Serial.print((unsigned int)i.AF.B.l, HEX);
     Serial.println((unsigned int)i.AF.B.h, HEX);
         
     i.SP.B.l=lhandle.read();
     i.SP.B.h=lhandle.read();
  // Serial.println("SP address");
  //   Serial.println((unsigned int)i.SP.W);
-  Serial.println("SP address: ");
-    Serial.println((unsigned int)i.SP.B.l, HEX);
+  Serial.print("SP address: ");
+    Serial.print((unsigned int)i.SP.B.l, HEX);
     Serial.println((unsigned int)i.SP.B.h, HEX);
 
     i.IM = lhandle.read();
- Serial.println("IM : ");
+    Serial.print("IM : ");
     Serial.println((unsigned int)i.IM, HEX);
  
     byte bordercol =lhandle.read();
- Serial.println("Border : ");
+    Serial.print("Border : ");
     Serial.println((unsigned int)bordercol, HEX);
  
 
     i.IFF1 = i.IFF2;
 
-   unsigned int thestack =  i.SP.B.h * 256 + i.SP.B.l;
-    unsigned int buf_p = 0;
+   uint16_t thestack =  i.SP.B.h * 256 + i.SP.B.l;
+   uint16_t buf_p = 0;
     while (lhandle.available())
     {
       bank1[buf_p] = lhandle.read();
       buf_p++;
     }
     lhandle.close();
-    Serial.println("noof bytes");
+    Serial.print("noof bytes: ");
     Serial.println(buf_p);
 
 
@@ -169,14 +169,14 @@ Z80_Regs i;
 
 
     //   unsigned int retaddr = bank1[(i.SP.D >>16) - 0x4000];
-    unsigned int retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
+    uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
   
      Serial.println("sp before");
-     Serial.println((unsigned int) i.SP.D, HEX);
+     Serial.println((uint16_t) i.SP.D, HEX);
     i.SP.D++;
     i.SP.D++;
      Serial.println("sp after");
-     Serial.println((unsigned int) i.SP.D, HEX);
+     Serial.println((uint16_t) i.SP.D, HEX);
     i.PC.D = 0x8400; //retaddr;  //0x7c19;  // 0x8400;  //manic miner is 0x8400   // 0x6000; atic atac doesnt run properly
     Serial.println("retn address");
     Serial.println(retaddr, HEX);
@@ -189,62 +189,3 @@ Z80_Regs i;
     return;
   }
 }
-
-/* 
-  blocksize=0;
-//  while(buf_p<size_read)
-  {
-    //Get block size
-    blocksize=(lbuffer[buf_p]+(lbuffer[buf_p+1]*0x100));
-   Serial.print("Blocksize: ");
-    Serial.println(blocksize);
-
-    //sprintf(lbl,"Specbuf n=%2x   N+1=%2x,  BLocksize %2x",specbuf[cdd],specbuf[cdd+1],blocksize);
-    //ret=MessageBox(NULL,lbl,"PALE Load Speccy",MB_ICONERROR | MB_OK);
-    if(blocksize<65000 && blocksize!=0)
-    {
-//        blockpos=0;
-        buf_p+=2;
-    
-        //Header
-        flag_byte = lbuffer[buf_p++];
-    Serial.print("Flag byte: ");
-    Serial.println(flag_byte);
-        header_byte1 = lbuffer[buf_p++];
-    Serial.print("Header 1st byte: ");
-    Serial.println(header_byte1);
-
-    for(int jj = 0;jj < 10;jj++)
-    {
-      Serial.write(lbuffer[buf_p + jj]);
-    }
-    Serial.println(" ");
-    buf_p+=10;
-
-        data_leng = lbuffer[buf_p]+lbuffer[buf_p+1]*0x100;
-    Serial.print("Data leng: ");
-    Serial.println(data_leng);
-    buf_p+=2;
-        param1 =  lbuffer[buf_p]+lbuffer[buf_p+1]*0x100;
-    Serial.print("Param 1: ");
-    Serial.println(param1);
-    buf_p+=2;
-        param2 =  lbuffer[buf_p]+lbuffer[buf_p+1]*0x100;
-    Serial.print("Param 2: ");
-    Serial.println(param2);
-
-*/
-
-      
-    //    while(blockpos<blocksize)
-    //    {
-    //      //Convert each byte into a pulse train
-    //      convert_specbyte(specbuf[cdd]);
-    //      cdd++;
-    //      blockpos++;
-    //    }
-//    }
-//
-//  }
-//   free(lbuffer);  
-//}

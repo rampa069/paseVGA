@@ -8,13 +8,8 @@
 #include <ESP32Lib.h>  // Bitluni VGA driver library
 
 #include <bt.h>
-//#include <esp_wifi.h>
 #include "PS2Kbd.h"
-//#include "SPI.h"
-#include <SPI.h>
-//#include <WiFi.h>
 #include "SPIFFS.h"
-//#include <WiFiMulti.h>
 #include "FS.h"
 
 //#include "SD.h
@@ -102,17 +97,12 @@ void setup()
   vga.setFrameBufferCount(2);
   //initializing i2s vga (with only one framebuffer)
   vga.init(vga.MODE320x240.custom(256, 192), redPin, greenPin, bluePin, hsyncPin, vsyncPin);
-  vga.setTextColor(vga.RGB(255, 0, 0), vga.RGB(0, 0, 255));
-  vga.setCursor(36, 41);
-  vga.print("ESP32 Spectrum emulation");
   
-  kb_begin();
+  //kb_begin();
   
   Serial.begin(115200);
 
-  #ifdef SD_ENABLED
-      test_sd();
-  #endif
+ 
 
   // ALLOCATE MEMORY
   //
@@ -147,7 +137,7 @@ xMutex = xSemaphoreCreateMutex();
                       0,          /* Priority of the task */
                       NULL,       /* Task handle. */
                       0);  /* Core where the task should run */
-  //load_speccy();
+  load_speccy();
 
 
 
@@ -155,8 +145,7 @@ xMutex = xSemaphoreCreateMutex();
 }
 
 
-// VIDEO core 0 *************************************
-// VIDEO core 0 *************************************
+
 // VIDEO core 0 *************************************
 
 void videoTask( void * parameter )
@@ -167,7 +156,7 @@ void videoTask( void * parameter )
    while(1)
    {
         xSemaphoreTake( xMutex, portMAX_DELAY );
-  digitalWrite(DEBUG_PIN,HIGH);
+        //digitalWrite(DEBUG_PIN,HIGH);
         for(unsigned int lin = 0;lin < 192;lin++)
         {
           for(ff=0;ff<32;ff++)  //foreach byte in line
@@ -193,14 +182,12 @@ void videoTask( void * parameter )
             }
           }
         } 
- digitalWrite(DEBUG_PIN,LOW);
+        //digitalWrite(DEBUG_PIN,LOW);
         xSemaphoreGive( xMutex ); 
         vTaskDelay(1) ;
      }
 }
       
-// SPECTRUM SCREEN DISPLAY
-// SPECTRUM SCREEN DISPLAY
 // SPECTRUM SCREEN DISPLAY
 //
 /* Calculate Y coordinate (0-192) from Spectrum screen memory location */
@@ -240,14 +227,12 @@ unsigned int zxcolor(byte c)
 
 
 // LOOP core 1 *************************************
-// LOOP core 1 *************************************
-// LOOP core 1 *************************************
 
 void loop() 
 {
   while (1) 
   { 
-        do_keyboard();
+        //do_keyboard();
         xSemaphoreTake( xMutex, portMAX_DELAY );
   digitalWrite(DEBUG_PIN2,HIGH);
              Z80_Execute();
@@ -311,153 +296,3 @@ void do_keyboard()
     bitWrite(z80ports_in[7], 3, keymap[0x31]);
     bitWrite(z80ports_in[7], 4, keymap[0x32]);
 }
-
-
-#ifdef SD_ENABLED
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
-    Serial.printf("Listing directory: %s\n", dirname);
-
-    File root = fs.open(dirname);
-    if(!root){
-        Serial.println("Failed to open directory");
-        return;
-    }
-    if(!root.isDirectory()){
-        Serial.println("Not a directory");
-        return;
-    }
-
-    File file = root.openNextFile();
-    while(file){
-        if(file.isDirectory()){
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
-            if(levels){
-                listDir(fs, file.name(), levels -1);
-            }
-        } else {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("  SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
-    }
-}
-
-void test_sd()
-{
-      if(!SD.begin(16, SPI, 1000000)){
-        Serial.println("Card Mount Failed");
-        return;
-    }
-    uint8_t cardType = SD.cardType();
-
-    if(cardType == CARD_NONE){
-        Serial.println("No SD card attached");
-        return;
-    }
-
-    Serial.print("SD Card Type: ");
-    if(cardType == CARD_MMC){
-        Serial.println("MMC");
-    } else if(cardType == CARD_SD){
-        Serial.println("SDSC");
-    } else if(cardType == CARD_SDHC){
-        Serial.println("SDHC");
-    } else {
-        Serial.println("UNKNOWN");
-    }
-
-    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
- 
- 
-  // re-open the file for reading:
-  myFile = SD.open("/AirRaid.tap", FILE_READ);
-  if (myFile) {
-    Serial.println("COMMAND.TXT:");
-
-    // read from the file until there's nothing else in it:
-    while (myFile.available()) {
-      Serial.write(myFile.read());
-    }
-    // close the file:
-    myFile.close();
-  } else {
-    // if the file didn't open, print an error:
-    Serial.println("error opening COMMAND.TXT");
-  }
-
-listDir(SD, "/", 0);
-
-}
-#endif
-
-/*         
-//taskENTER_CRITICAL(&screenMux);
-//taskEXIT_CRITICAL(&screenMux);
-  //    xSemaphoreTake( xMutex, portMAX_DELAY );       
-   //   xSemaphoreGive( xMutex );
-//        taskENTER_CRITICAL(&screenMux);
-//        taskEXIT_CRITICAL(&screenMux);
-
-
-//  timer = timerBegin(0, 80, true);
-//  timerAttachInterrupt(timer, &onTimer, true);
-//  timerAlarmWrite(timer, 1000000, true);
-//  timerAlarmEnable(timer);
-
-    int fpsval;
-    if (interruppted > 0)
-    {
-     
-        portENTER_CRITICAL(&timerMux);
-        fpsval = interruptfps; 
-        interruptfps = 0;
-        interruppted = 0;
-        portEXIT_CRITICAL(&timerMux);
-     
-           // totalInterruptCounter++;
-         
-        //    Serial.print("FPS: ");
-        //    Serial.println(fpsval);
-        //    Serial.print("HEAPSIZE: ");
-        //    Serial.println(system_get_free_heap_size());
-    }   
-
-
-//xSemaphoreTake( xMutex, portMAX_DELAY );
-//  taskENTER_CRITICAL_ISR(&screenMux);
-      
-      // portMUX_TYPE myMutex = portMUX_INITIALIZER_UNLOCKED;
-      // taskENTER_CRITICAL(&myMutex);
-    //   vTaskDelay(1) ;
-//interruptfps++;     
-//   taskEXIT_CRITICAL_ISR(&screenMux);
-//xSemaphoreGive( xMutex );   
-      // taskEXIT_CRITICAL(&myMutex);
-
-
-
-SemaphoreHandle_t xMutex;
-
-
-int interruptfps = 0;
-int interruppted = 0;
-
-//hw_timer_t * timer = NULL;
-//portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-portMUX_TYPE screenMux = portMUX_INITIALIZER_UNLOCKED;
-
-//void IRAM_ATTR onTimer() 
-//{
-//  portENTER_CRITICAL_ISR(&timerMux);
-//  interruppted++;
-//  portEXIT_CRITICAL_ISR(&timerMux);
-// 
-//}
-
-    
- */
