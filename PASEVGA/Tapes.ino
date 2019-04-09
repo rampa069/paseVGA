@@ -79,8 +79,8 @@ Z80_Regs i;
 //  lhandle = SPIFFS.open("/AirRaid.tap", FILE_READ);
 //  lhandle = SPIFFS.open("/FloydsBank .tap", FILE_READ);
 //  lhandle = SPIFFS.open("/OhMummy.tap", FILE_READ);
-//  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
-lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
+  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
 //
 //  lhandle = SPIFFS.open("/jetpac.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
@@ -181,9 +181,9 @@ lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
      Serial.println((uint16_t) i.SP.D, HEX);
      
     i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
-    i.PC.D = 24288;
-    //i.PC.D= 0x6000;
-    //i.PC.D=retaddr;
+    //i.PC.D = 24288; // Skool daze
+    
+    //i.PC.D=retaddr; //dont work as expected. :-(
     Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
 
