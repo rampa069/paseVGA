@@ -1,4 +1,4 @@
-BB# paseVGA
+# paseVGA
 
 An emulation of the ZXSpectrum computer on an ESP32 and VGA Screen using the
 bitluni VGA card.
@@ -17,6 +17,8 @@ Will load SNA snapshots from SPIFF space.
 
 Comment out the 'load_speccy' line in Setup to boot normally or change the
 SNA file and startup address in Tapes.INO 
+
+ Look/change plaedefs.h to change vga, keyboard and buzzer pins
 
 Bugs: 
 
