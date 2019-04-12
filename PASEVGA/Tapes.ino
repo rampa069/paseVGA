@@ -75,19 +75,12 @@ Z80_Regs i;
         return;
     }
     
- // open a file for input      
-//  lhandle = SPIFFS.open("/AirRaid.tap", FILE_READ);
-//  lhandle = SPIFFS.open("/FloydsBank .tap", FILE_READ);
-//  lhandle = SPIFFS.open("/OhMummy.tap", FILE_READ);
-  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
+// open a file for input      
+     lhandle = SPIFFS.open("/manic.sna", FILE_READ);
+//   lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
 //
 //  lhandle = SPIFFS.open("/jetpac.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/sabre.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/underw.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/alien8.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/emerald.sna", FILE_READ);
 
   size_read=0;
   if(lhandle!=NULL)
@@ -97,38 +90,36 @@ Z80_Regs i;
     i.I=lhandle.read();
     i.HL2.B.l=lhandle.read();
     i.HL2.B.h=lhandle.read();
-    i.BC2.B.l=lhandle.read();
-    i.BC2.B.h=lhandle.read();
     i.DE2.B.l=lhandle.read();
     i.DE2.B.h=lhandle.read();
+    i.BC2.B.l=lhandle.read();
+    i.BC2.B.h=lhandle.read();
     i.AF2.B.l=lhandle.read();
     i.AF2.B.h=lhandle.read();
 
     i.HL.B.l=lhandle.read();
     i.HL.B.h=lhandle.read();
-    i.BC.B.l=lhandle.read();
-    i.BC.B.h=lhandle.read();
     i.DE.B.l=lhandle.read();
     i.DE.B.h=lhandle.read();
+    i.BC.B.l=lhandle.read();
+    i.BC.B.h=lhandle.read();
     i.IY.B.l=lhandle.read();
     i.IY.B.h=lhandle.read();
     i.IX.B.l=lhandle.read();
     i.IX.B.h=lhandle.read();
 
     byte inter =lhandle.read();
-  Serial.print("inter address: ");
+    Serial.print("inter address: ");
     Serial.println((unsigned int)inter, HEX);
-    if(inter & 0x04 == 0)
-        i.IFF2 = 0;
-    else
-        i.IFF2 = 1;
-
+    
+    i.IFF2 = ( inter & 0x04 ) ? 1 : 0;
+    
     i.R =lhandle.read();
  Serial.print("R : ");
     Serial.println((uint8_t)i.R, HEX);
  
-    i.AF.B.l=lhandle.read();
     i.AF.B.h=lhandle.read();
+    i.AF.B.l=lhandle.read();
  Serial.print("AF : ");
     Serial.print((unsigned int)i.AF.B.l, HEX);
     Serial.println((unsigned int)i.AF.B.h, HEX);
@@ -172,8 +163,7 @@ Z80_Regs i;
 
 
     //   unsigned int retaddr = bank1[(i.SP.D >>16) - 0x4000];
-    uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
-  
+     uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
      Serial.print("sp before");
      Serial.println((uint16_t) i.SP.D, HEX);
     i.SP.D++;
