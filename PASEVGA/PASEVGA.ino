@@ -55,7 +55,7 @@ byte *bank2;
 byte *bank3;
 byte z80ports_in[32];
 byte borderTemp =7;
-
+byte flashing = 0;
 
 // SETUP *************************************
 // SETUP *************************************
@@ -140,11 +140,17 @@ void videoTask( void * parameter )
    unsigned int ff,i,byte_offset;
    unsigned char color_attrib,pixel_map,zx_fore_color,zx_back_color;
    unsigned int zx_vidcalc;
+   unsigned int tmpColour;
+   
    
    while(1)
    {
         xSemaphoreTake( xMutex, portMAX_DELAY );
         //digitalWrite(DEBUG_PIN,HIGH);
+        
+        if (flashing++ > 30)
+            flashing=0;
+            
         vga.clear(zxcolor(borderTemp));
         for(unsigned int lin = 0;lin < 192;lin++)
         {
@@ -158,6 +164,16 @@ void videoTask( void * parameter )
             pixel_map=bank1[byte_offset];
             zx_fore_color=color_attrib & 0x07;
             zx_back_color=(color_attrib & 0x38)>>3;
+
+            if bitRead(color_attrib,7){
+              if (flashing > 15) {
+                  tmpColour=zx_fore_color;
+                  zx_fore_color=zx_back_color;
+                  zx_back_color=tmpColour;              
+              }
+            }
+            
+            
 
             for(i=0;i<8;i++)  //foreach pixel within a byte
             {
