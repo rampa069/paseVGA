@@ -148,7 +148,7 @@ void videoTask( void * parameter )
         xSemaphoreTake( xMutex, portMAX_DELAY );
         //digitalWrite(DEBUG_PIN,HIGH);
         
-        if (flashing++ > 30)
+        if (flashing++ > 20)
             flashing=0;
             
         vga.clear(zxcolor(borderTemp));
@@ -166,7 +166,7 @@ void videoTask( void * parameter )
             zx_back_color=(color_attrib & 0x38)>>3;
 
             if bitRead(color_attrib,7){
-              if (flashing > 15) {
+              if (flashing > 10) {
                   tmpColour=zx_fore_color;
                   zx_fore_color=zx_back_color;
                   zx_back_color=tmpColour;              
@@ -190,7 +190,7 @@ void videoTask( void * parameter )
          vga.show(); 
         //digitalWrite(DEBUG_PIN,LOW);
         xSemaphoreGive( xMutex ); 
-        vTaskDelay(1) ;
+        vTaskDelay(0) ;
      }
 }
       
