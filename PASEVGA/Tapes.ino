@@ -148,6 +148,7 @@ Z80_Regs i;
     byte bordercol =lhandle.read();
     Serial.print("Border : ");
     Serial.println((unsigned int)bordercol, HEX);
+    borderTemp = bordercol;
  
 
     i.IFF1 = i.IFF2;
