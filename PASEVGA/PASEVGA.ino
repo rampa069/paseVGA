@@ -54,6 +54,7 @@ byte *bank1;
 byte *bank2;
 byte *bank3;
 byte z80ports_in[32];
+byte borderTemp =7;
 
 
 // SETUP *************************************
@@ -139,13 +140,12 @@ void videoTask( void * parameter )
    unsigned int ff,i,byte_offset;
    unsigned char color_attrib,pixel_map,zx_fore_color,zx_back_color;
    unsigned int zx_vidcalc;
-   //int border = Z80_RDMEM(0x5C48) &0x38  >>3;
-   int border = 0;
+   
    while(1)
    {
         xSemaphoreTake( xMutex, portMAX_DELAY );
         //digitalWrite(DEBUG_PIN,HIGH);
-        vga.clear(border);
+        vga.clear(zxcolor(borderTemp));
         for(unsigned int lin = 0;lin < 192;lin++)
         {
           for(ff=0;ff<32;ff++)  //foreach byte in line

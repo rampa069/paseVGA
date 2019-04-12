@@ -22,6 +22,7 @@
 
 extern byte z80ports_in[32];
 extern byte *bank1;
+extern byte borderTemp;
 
 int start_im1_irq=0;
 int start_ss_nmi=0;
@@ -1106,7 +1107,13 @@ void Z80_Out (uint16_t Port,byte Value)
   {
     case 0xfe:
     {     
+      
+      bitWrite(borderTemp,0,bitRead(Value,0));
+      bitWrite(borderTemp,1,bitRead(Value,1));
+      bitWrite(borderTemp,2,bitRead(Value,2));
+
       digitalWrite(SOUND_PIN,bitRead(Value,4));
+           
       break;
     }
   }
