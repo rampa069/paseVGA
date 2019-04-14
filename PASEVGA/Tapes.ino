@@ -76,10 +76,10 @@ Z80_Regs i;
     }
     
 // open a file for input      
-     lhandle = SPIFFS.open("/manic.sna", FILE_READ);
+     lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
 //   lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
 //
-//  lhandle = SPIFFS.open("/jetpac.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
 
   size_read=0;
@@ -171,10 +171,10 @@ Z80_Regs i;
      Serial.print("sp after");
      Serial.println((uint16_t) i.SP.D, HEX);
      
-    i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
+    //i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
     //i.PC.D = 24288; // Skool daze
     
-    //i.PC.D=retaddr; //dont work as expected. :-(
+    i.PC.D=retaddr; //dont work as expected. :-(
     Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
 
