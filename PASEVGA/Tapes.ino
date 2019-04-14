@@ -76,8 +76,8 @@ Z80_Regs i;
     }
     
 // open a file for input      
-     lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
-//   lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
+     lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
+//   lhandle = SPIFFS.open("/spong.sna", FILE_READ);
 //
 //  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
@@ -172,14 +172,17 @@ Z80_Regs i;
      Serial.println((uint16_t) i.SP.D, HEX);
      
     //i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
+    //i.PC.D = 0x5de5; // Speccy Pong
+    i.PC.D=0x5e88; // Escape from the pyramid
     //i.PC.D = 24288; // Skool daze
-    
-    i.PC.D=retaddr; //dont work as expected. :-(
+    //i.PC.D = 24000;
+    //i.PC.D=retaddr; //dont work as expected. :-(
     Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
 
     Serial.print ("Calculated PC: ");
     Serial.println(i.PC.D, HEX);
+     
 
     Z80_SetRegs (&i);
   }

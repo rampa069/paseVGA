@@ -20,7 +20,7 @@
 //
 //#define SD_ENABLED
 //#define DEBUG
-bool run_snapshot = false;
+bool run_snapshot = true;
 bool run_debug = false;
 
 
@@ -68,7 +68,22 @@ void setup()
   // Turn off peripherals to gain memory (?do they release properly)
   esp_bt_controller_deinit();
   esp_bt_controller_mem_release(ESP_BT_MODE_BTDM);
-  //  esp_wifi_set_mode(WIFI_MODE_NULL);
+  //esp_wifi_set_mode(WIFI_MODE_NULL);
+  Serial.begin(115200);
+  
+  Serial.println("CHIP setup.");
+  Serial.println("VGA framebufer");
+  
+  //we need double buffering for smooth animations 
+  vga.setFrameBufferCount(2);
+  
+  Serial.println("VGA init");
+  
+  //initializing i2s vga (with only one framebuffer)
+  //vga.init(vga.MODE340x200.custom(266, 200), redPin, greenPin, bluePin, hsyncPin, vsyncPin);
+  vga.init(vga.MODE360x200 , redPin, greenPin, bluePin, hsyncPin, vsyncPin);
+  Serial.println("VGA initialized");
+  
   
   pinMode(SOUND_PIN,OUTPUT);
   digitalWrite(SOUND_PIN,LOW);
@@ -78,15 +93,11 @@ void setup()
   pinMode(DEBUG_PIN2,OUTPUT);
   digitalWrite(DEBUG_PIN2,LOW);
   
-  //we need double buffering for smooth animations
-  vga.setFrameBufferCount(2);
   
-  //initializing i2s vga (with only one framebuffer)
-  vga.init(vga.MODE320x200.custom(266, 200), redPin, greenPin, bluePin, hsyncPin, vsyncPin);
+  
   
   kb_begin();
   
-  Serial.begin(115200);
 
  
 
@@ -139,7 +150,7 @@ xMutex = xSemaphoreCreateMutex();
 void videoTask( void * parameter )
 {
    unsigned int ff,i,byte_offset;
-   unsigned char color_attrib,pixel_map,zx_fore_color,zx_back_color;
+   unsigned char color_attrib,pixel_map,zx_fore_color,zx_back_color,flash,bright;
    unsigned int zx_vidcalc;
    unsigned int tmpColour;
    
@@ -152,7 +163,7 @@ void videoTask( void * parameter )
         if (flashing++ > 20)
             flashing=0;
             
-        vga.clear(zxcolor(borderTemp));
+        vga.clear(zxcolor(borderTemp,0));
         for(unsigned int lin = 0;lin < 192;lin++)
         {
           for(ff=0;ff<32;ff++)  //foreach byte in line
@@ -166,7 +177,10 @@ void videoTask( void * parameter )
             zx_fore_color=color_attrib & 0x07;
             zx_back_color=(color_attrib & 0x38)>>3;
 
-            if bitRead(color_attrib,7){
+            flash=bitRead(color_attrib,7);
+            bright=bitRead(color_attrib,6);
+            
+            if (flash){
               if (flashing > 10) {
                   tmpColour=zx_fore_color;
                   zx_fore_color=zx_back_color;
@@ -181,9 +195,9 @@ void videoTask( void * parameter )
                 zx_vidcalc=ff*8+i;
                 byte bitpos = (0x80 >> i);
                 if((pixel_map & bitpos)!=0)
-                               vga.dotFast(zx_vidcalc+5, calcY(byte_offset)+5,zxcolor(zx_fore_color)) ;          
+                               vga.dotFast(zx_vidcalc+52, calcY(byte_offset)+5,zxcolor(zx_fore_color,bright)) ;          
                 else
-                               vga.dotFast(zx_vidcalc+5, calcY(byte_offset)+5,zxcolor(zx_back_color)) ;          
+                               vga.dotFast(zx_vidcalc+52, calcY(byte_offset)+5,zxcolor(zx_back_color,bright)) ;          
     
             }
           }
@@ -210,24 +224,30 @@ int calcX(int offset){
 }
 
 
-unsigned int zxcolor(byte c)
+unsigned int zxcolor(byte c,byte f)
 {
+  int rgbLevel=192;
+  if (f)
+    rgbLevel=255;
+  else
+    rgbLevel=192;
+    
   if(c == 0)
     return vga.RGB(0,0,0);
   else if (c == 1)
-    return vga.RGB(0,0,255);
+    return vga.RGB(0,0,rgbLevel);
   else if (c == 2)
-    return vga.RGB(255,0,0);
+    return vga.RGB(rgbLevel,0,0);
   else if (c == 3)
-    return vga.RGB(255,0,255);
+    return vga.RGB(rgbLevel,0,rgbLevel);
   else if (c == 4)
-    return vga.RGB(0,255,0);
+    return vga.RGB(0,rgbLevel,0);
   else if (c == 5)
-    return vga.RGB(0,255,255);
+    return vga.RGB(0,rgbLevel,rgbLevel);
   else if (c == 6)
-    return vga.RGB(255,255,0);
+    return vga.RGB(rgbLevel,rgbLevel,0);
   else if (c == 7)
-    return vga.RGB(255,255,255);
+    return vga.RGB(rgbLevel,rgbLevel,rgbLevel);
   return 0;  
 }
 
