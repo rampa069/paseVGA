@@ -15,13 +15,17 @@ Z80 core is by Marcel de Kogel
 
 Will load SNA snapshots from SPIFF space.
 
-Comment out the 'load_speccy' line in Setup to boot normally or change the
+
+set run_snaphot to false  to boot normally or set it to true ans  change the
 SNA file and startup address in Tapes.INO 
+
+ There is no copyrighted games in the data folder, if you have the right to
+use on, copy it to the data folder.
 
  Look/change paledefs.h to change vga, keyboard and buzzer pins
 
 Bugs: 
 
 For some reason the SNA snapshot will not run properly using the RETN from the pushed PC on the stack, 
-the code in 'tapes' has a hardcoded jumps to the startup address.
+the code in 'tapes' has a hardcoded jump to the startup address.
 

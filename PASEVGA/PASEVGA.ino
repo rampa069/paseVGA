@@ -20,6 +20,7 @@
 //
 //#define SD_ENABLED
 //#define DEBUG
+bool run_snapshot = false;
 bool run_debug = false;
 
 
@@ -123,8 +124,8 @@ xMutex = xSemaphoreCreateMutex();
                       NULL,       /* Task handle. */
                       0);  /* Core where the task should run */
   
-  // Comment this line lo boot spectrum  ROM
-  load_speccy();
+  if (run_snapshot) 
+     load_speccy();
 
 
 
