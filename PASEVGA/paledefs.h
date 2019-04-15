@@ -1,7 +1,7 @@
 
 
 //#define IS_SPECCY
-#define SOUND_PIN 34
+#define SOUND_PIN 0
 
 #define KEYBOARD_DATA 25
 #define KEYBOARD_CLK  26
