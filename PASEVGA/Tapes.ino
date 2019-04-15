@@ -76,11 +76,12 @@ Z80_Regs i;
     }
     
 // open a file for input      
-     lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
-//   lhandle = SPIFFS.open("/spong.sna", FILE_READ);
+  lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
 //
 //  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
+//    lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
 
   size_read=0;
   if(lhandle!=NULL)
@@ -126,11 +127,13 @@ Z80_Regs i;
         
     i.SP.B.l=lhandle.read();
     i.SP.B.h=lhandle.read();
- // Serial.println("SP address");
- //   Serial.println((unsigned int)i.SP.W);
-  Serial.print("SP address: ");
+    
+    Serial.print("SP address: ");
     Serial.print((unsigned int)i.SP.B.l, HEX);
     Serial.println((unsigned int)i.SP.B.h, HEX);
+    i.SP.D=i.SP.B.l+i.SP.B.h * 0x100;
+    Serial.print("SP address (D): ");
+    Serial.println((unsigned int)i.SP.D, HEX);
 
     i.IM = lhandle.read();
     Serial.print("IM : ");
@@ -144,7 +147,7 @@ Z80_Regs i;
 
     i.IFF1 = i.IFF2;
 
-   uint16_t thestack =  i.SP.B.h * 256 + i.SP.B.l;
+   uint16_t thestack =  i.SP.D;
    uint16_t buf_p = 0;
     while (lhandle.available())
     {
@@ -162,8 +165,9 @@ Z80_Regs i;
 
 
 
-    //   unsigned int retaddr = bank1[(i.SP.D >>16) - 0x4000];
-     uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
+    uint16_t offset = thestack - 0x4000;
+     //uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
+     uint16_t retaddr = bank1[offset]+0x100 * bank1[offset+1] ;
      Serial.print("sp before");
      Serial.println((uint16_t) i.SP.D, HEX);
     i.SP.D++;
@@ -173,17 +177,17 @@ Z80_Regs i;
      
     //i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
     //i.PC.D = 0x5de5; // Speccy Pong
-    i.PC.D=0x5e88; // Escape from the pyramid
+    //i.PC.D=0x5e88; // Escape from the pyramid
     //i.PC.D = 24288; // Skool daze
     //i.PC.D = 24000;
-    //i.PC.D=retaddr; //dont work as expected. :-(
+    i.PC.D=retaddr; //dont work as expected. :-(
     Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
 
     Serial.print ("Calculated PC: ");
     Serial.println(i.PC.D, HEX);
      
-
+    
     Z80_SetRegs (&i);
   }
   else

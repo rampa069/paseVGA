@@ -271,8 +271,6 @@ void loop()
 }
 
 
-
-
 void do_keyboard()
 {
     bitWrite(z80ports_in[0], 0, keymap[0x12]);
@@ -321,5 +319,7 @@ void do_keyboard()
     bitWrite(z80ports_in[7], 1, keymap[0x14]);
     bitWrite(z80ports_in[7], 2, keymap[0x3a]);
     bitWrite(z80ports_in[7], 3, keymap[0x31]);
-    bitWrite(z80ports_in[7], 4, keymap[0x32]);
+    bitWrite(z80ports_in[7], 4, keymap[0x32]);  
+
+    
 }
