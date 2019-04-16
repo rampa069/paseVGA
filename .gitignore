@@ -1,4 +1,6 @@
 *~
 .DS_Store
-PASEVGA/data/copyrighted
+PASEVGA/data/**
+!PASEVGA/data/fantasy.sna
+!PASEVGA/data/sppong.sna
 
