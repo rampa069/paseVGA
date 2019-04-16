@@ -6,7 +6,6 @@
 //     Please, notify me, if you make any changes to this file        
 // ____________________________________________________
 #include <ESP32Lib.h>  // Bitluni VGA driver library
-
 #include <bt.h>
 #include "PS2Kbd.h"
 #include "SPIFFS.h"
@@ -58,19 +57,20 @@ byte z80ports_in[32];
 byte borderTemp =7;
 byte flashing = 0;
 
-// SETUP *************************************
-// SETUP *************************************
+
 // SETUP *************************************
 SemaphoreHandle_t xMutex;
 
+
 void setup()
 {
+  
+
   // Turn off peripherals to gain memory (?do they release properly)
   esp_bt_controller_deinit();
   esp_bt_controller_mem_release(ESP_BT_MODE_BTDM);
   //esp_wifi_set_mode(WIFI_MODE_NULL);
   Serial.begin(115200);
-  
   Serial.println("CHIP setup.");
   Serial.println("VGA framebufer");
   
@@ -78,9 +78,7 @@ void setup()
   vga.setFrameBufferCount(2);
   
   Serial.println("VGA init");
-  
-  //initializing i2s vga (with only one framebuffer)
-  //vga.init(vga.MODE340x200.custom(266, 200), redPin, greenPin, bluePin, hsyncPin, vsyncPin);
+ 
   vga.init(vga.MODE360x200 , redPin, greenPin, bluePin, hsyncPin, vsyncPin);
   Serial.println("VGA initialized");
   
@@ -107,8 +105,7 @@ void setup()
   if(bank1 == NULL)Serial.println("Failed to allocate Bank 1 memory");
 
   // START Z80
-  // START Z80
-  // START Z80
+  
   Serial.println("RESETTING Z80");
   Z80_Reset(); 
 
@@ -205,7 +202,7 @@ void videoTask( void * parameter )
          vga.show(); 
         //digitalWrite(DEBUG_PIN,LOW);
         xSemaphoreGive( xMutex ); 
-        vTaskDelay(0) ;
+        vTaskDelay(1) ;
      }
 }
       

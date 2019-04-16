@@ -76,11 +76,12 @@ Z80_Regs i;
     }
     
 // open a file for input      
-  lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
-//  lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
+// lhandle = SPIFFS.open("/gandalf.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
+    lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
 //
 //  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
-//    lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
 
   size_read=0;
@@ -166,21 +167,16 @@ Z80_Regs i;
 
 
     uint16_t offset = thestack - 0x4000;
-     //uint16_t retaddr = bank1[thestack - 0x4000] + bank1[thestack+1 - 0x4000] * 256 ;
-     uint16_t retaddr = bank1[offset]+0x100 * bank1[offset+1] ;
-     Serial.print("sp before");
-     Serial.println((uint16_t) i.SP.D, HEX);
+    uint16_t retaddr = bank1[offset]+0x100 * bank1[offset+1] ;
+    Serial.print("sp before");
+    Serial.println((uint16_t) i.SP.D, HEX);
     i.SP.D++;
     i.SP.D++;
-     Serial.print("sp after");
-     Serial.println((uint16_t) i.SP.D, HEX);
+    Serial.print("sp after");
+    Serial.println((uint16_t) i.SP.D, HEX);
      
-    //i.PC.D = 0x8400; //retaddr;  //Manic miner, JSW and friends
-    //i.PC.D = 0x5de5; // Speccy Pong
-    //i.PC.D=0x5e88; // Escape from the pyramid
-    //i.PC.D = 24288; // Skool daze
-    //i.PC.D = 24000;
     i.PC.D=retaddr; //dont work as expected. :-(
+
     Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
 
