@@ -5,6 +5,8 @@
 //     You are not allowed to distribute this software commercially     
 //     Please, notify me, if you make any changes to this file        
 // ____________________________________________________
+
+
 #include <ESP32Lib.h>  // Bitluni VGA driver library
 #include <bt.h>
 #include "PS2Kbd.h"
@@ -128,7 +130,7 @@ xMutex = xSemaphoreCreateMutex();
                       "videoTask", /* Name of the task */
                       2048,      /* Stack size in words */
                       NULL,       /* Task input parameter */
-                      0,          /* Priority of the task */
+                      20,          /* Priority of the task */
                       NULL,       /* Task handle. */
                       0);  /* Core where the task should run */
   
@@ -257,12 +259,13 @@ void loop()
   while (1) 
   { 
         do_keyboard();
-        xSemaphoreTake( xMutex, portMAX_DELAY );
+        //xSemaphoreTake( xMutex, portMAX_DELAY );
         //digitalWrite(DEBUG_PIN2,HIGH);
              Z80_Execute();
         //digitalWrite(DEBUG_PIN2,LOW);
-        xSemaphoreGive( xMutex );
+        //xSemaphoreGive( xMutex );
         start_im1_irq=1;    // keyboard scan is run in IM1 interrupt
+        delay(25);
         vTaskDelay(1) ;  //important to avoid task watchdog timeouts - change this to slow down emu
   } 
 }

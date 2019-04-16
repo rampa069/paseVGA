@@ -76,7 +76,7 @@ Z80_Regs i;
     }
     
 // open a file for input      
-// lhandle = SPIFFS.open("/gandalf.sna", FILE_READ);
+//  lhandle = SPIFFS.open("/beep.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
     lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
 //
@@ -176,7 +176,7 @@ Z80_Regs i;
     Serial.println((uint16_t) i.SP.D, HEX);
      
     i.PC.D=retaddr; //dont work as expected. :-(
-
+    //i.PC.D=0x8400;
     Serial.print("retn address: ");
     Serial.println(retaddr, HEX);
 

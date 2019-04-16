@@ -11,30 +11,35 @@ byte keymap[256];
 
 void kb_interruptHandler()
 {
+    
     shift>>=1;
-    shift|=(digitalRead(KEYBOARD_DATA)<<10);
+    shift|=(digitalRead(KEYBOARD_DATA)<<9);
     if(++rc==11)
     {
-          uint8_t data=(shift>>1)&0xff;
-          lastcode = data;
-          rc=0;
-          shift=0;
-          if(!keyup)
-          {
-            if(data == 0xf0)
-              keyup = true;
-            else
-              keymap[data] = 0;
-          }
-          else
-          {
-            keymap[data] = 1;
-            Serial.print(keymap[data]);
-            keyup = false;
-          }
-          Serial.print(keymap[data]);
-
+         
+            uint8_t data=(shift>>1)&0xff;
+            lastcode = data;
+            rc=0;
+            shift=0;
+            if (data != 240) {
+                 keymap[data] = 0;
+            } else {
+              for(int gg = 0;gg < 256;gg++)
+                 keymap[gg] = 1;
+             
+            }
+           
+        /*   Serial.print("Received keys: ");
+           for (int a=0;a<256;a++)
+           {
+             Serial.print(keymap[a]);
+             Serial.print(" ");
+           }
+           Serial.println("");
+           Serial.print("Lastcode:");      
+           Serial.println(lastcode); */
     }
+ 
 }
 
 
