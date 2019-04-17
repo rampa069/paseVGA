@@ -148,7 +148,7 @@ void Z80_Patch (Z80_Regs *Regs)   /* Called when ED FE occurs. Can be used */
 
 
 int Z80_Interrupt(void)
-{  
+{
 //   return(Z80_IGNORE_INT );
 //   return(0xff);
 //return(0xff);

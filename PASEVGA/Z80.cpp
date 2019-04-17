@@ -2473,8 +2473,6 @@ int Z80_Execute (void)
  unsigned opcode;
  Z80_Running=1;
  InitTables ();
-
- 
  
  do
  {
@@ -2509,10 +2507,12 @@ if(run_debug)
 
   Z80_ICount-=cycles_main[opcode];
   (*(opcode_main[opcode]))();
+  int retardo=(unsigned int) opcode_main[opcode] / 600000000;
+  delayMicroseconds(retardo);
  }
  while (Z80_ICount>0);
- 
  Z80_ICount+=Z80_IPeriod;
+ //delay(cycles_main[opcode] * 1.45);
  Interrupt (Z80_Interrupt());
  return Z80_Running;
 }

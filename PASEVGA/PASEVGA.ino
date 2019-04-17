@@ -265,7 +265,7 @@ void loop()
         //digitalWrite(DEBUG_PIN2,LOW);
         //xSemaphoreGive( xMutex );
         start_im1_irq=1;    // keyboard scan is run in IM1 interrupt
-        delay(25);
+        //delay(25);
         vTaskDelay(1) ;  //important to avoid task watchdog timeouts - change this to slow down emu
   } 
 }
