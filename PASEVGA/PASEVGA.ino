@@ -46,6 +46,8 @@ byte Z80_RDMEM(uint16_t A);
 void Z80_WRMEM(uint16_t A,byte V);
 extern byte bank_latch;
 extern int start_im1_irq;
+void measure_clock();
+void setup_cpuspeed(int per);
 
 File myFile;
 
@@ -92,20 +94,17 @@ void setup()
   digitalWrite(DEBUG_PIN,LOW);
   pinMode(DEBUG_PIN2,OUTPUT);
   digitalWrite(DEBUG_PIN2,LOW);
-  
-  
-  
-  
+   
   kb_begin();
   
-
- 
-
   // ALLOCATE MEMORY
   //
   bank1 = (byte *)malloc(49152);
   if(bank1 == NULL)Serial.println("Failed to allocate Bank 1 memory");
 
+  setup_cpuspeed(100);
+  measure_clock();
+  
   // START Z80
   
   Serial.println("RESETTING Z80");

@@ -47,8 +47,8 @@ static void ei(void);
 
 static Z80_Regs R;
 int Z80_Running=1;
-int Z80_IPeriod=70000;
-int Z80_ICount=70000;
+int Z80_IPeriod;
+int Z80_ICount;
 
 int Z80_IRQ = 0;          /* Current IRQ status. Checked after EI occurs */
 
@@ -2507,12 +2507,11 @@ if(run_debug)
 
   Z80_ICount-=cycles_main[opcode];
   (*(opcode_main[opcode]))();
-  int retardo=(unsigned int) opcode_main[opcode] / 600000000;
-  delayMicroseconds(retardo);
+  int retardo=(float) cycles_main[opcode] /4 ;
+  delayMicroseconds(3);
  }
  while (Z80_ICount>0);
  Z80_ICount+=Z80_IPeriod;
- //delay(cycles_main[opcode] * 1.45);
  Interrupt (Z80_Interrupt());
  return Z80_Running;
 }

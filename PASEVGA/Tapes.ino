@@ -78,7 +78,7 @@ Z80_Regs i;
 // open a file for input      
 //  lhandle = SPIFFS.open("/beep.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
-lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
+    lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
 //
 //  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
