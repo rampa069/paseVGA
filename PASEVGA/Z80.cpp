@@ -2501,13 +2501,16 @@ if(run_debug)
   Serial.print(R.BC.D,HEX);
   Serial.print("  AF: ");
   Serial.println(R.AF.D,HEX);
+  Serial.printf("T-States: %d\n",cycles_main[opcode]);
+  Serial.printf("R-Register: %d\n",cycles_main[opcode]);
 }
  
   R.PC.W.l++;
 
   Z80_ICount-=cycles_main[opcode];
   (*(opcode_main[opcode]))();
-  int retardo=(float) cycles_main[opcode] /4 ;
+  int retardo= cycles_main[opcode]*0.27 *2 ;
+  
   delayMicroseconds(3);
  }
  while (Z80_ICount>0);

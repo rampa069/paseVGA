@@ -104,6 +104,7 @@ void setup()
 
   setup_cpuspeed(100);
   measure_clock();
+  delay(10000);
   
   // START Z80
   
