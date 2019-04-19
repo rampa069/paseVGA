@@ -21,7 +21,7 @@
 //
 //#define SD_ENABLED
 //#define DEBUG
-bool run_snapshot = true;
+bool run_snapshot = false;
 bool run_debug = false;
 
 
@@ -278,6 +278,7 @@ void loop()
 
 void do_keyboard()
 {
+    
     bitWrite(z80ports_in[0], 0, keymap[0x12]);
     bitWrite(z80ports_in[0], 1, keymap[0x1a]);
     bitWrite(z80ports_in[0], 2, keymap[0x22]);
@@ -325,6 +326,6 @@ void do_keyboard()
     bitWrite(z80ports_in[7], 2, keymap[0x3a]);
     bitWrite(z80ports_in[7], 3, keymap[0x31]);
     bitWrite(z80ports_in[7], 4, keymap[0x32]);  
-
+    
     
 }
