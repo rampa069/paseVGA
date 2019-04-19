@@ -1,4 +1,3 @@
-/*** Z80Em: Portable Z80 emulator *******************************************/
 /***                                                                      ***/
 /***                                Z80IO.h                               ***/
 /***                                                                      ***/
@@ -21,7 +20,7 @@
 #include <stdint.h>
 
 extern byte z80ports_in[32];
-extern byte *bank1;
+extern byte *bank0;
 extern byte borderTemp;
 
 int start_im1_irq=0;
@@ -101,14 +100,14 @@ byte Z80_RDMEM(uint16_t A)
     {
         return specrom[A];
     }
-    return bank1[A - 0x4000];
+    return bank0[A - 0x4000];
 }
 
 void Z80_WRMEM(uint16_t A,byte V)
 {
       if(A >= 0x4000)
       {
-         bank1[A - 0x4000]=V;
+         bank0[A - 0x4000]=V;
       }
 }
 
@@ -152,6 +151,7 @@ int Z80_Interrupt(void)
 //   return(Z80_IGNORE_INT );
 //   return(0xff);
 //return(0xff);
+     
 
 //  static int ii=0,jj=0;
   

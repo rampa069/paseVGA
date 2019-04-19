@@ -2,7 +2,7 @@
 //#include "Z80.h"
 //extern typedef Z80_Regs;
 
-extern byte *bank1;
+extern byte *bank0;
 
 typedef int32_t      dword;
 typedef signed char    offset;
@@ -67,9 +67,8 @@ int file_id;
 byte *lbuffer;
 Z80_Regs i;
 
-  Serial.print("Free Heap: ");
-  Serial.println(system_get_free_heap_size());
- 
+  Serial.printf("Free Heap before SNA: %d\n",system_get_free_heap_size());
+
   if(!SPIFFS.begin()){
         Serial.println("Internal memory Mount Failed");
         return;
@@ -80,7 +79,7 @@ Z80_Regs i;
 //  lhandle = SPIFFS.open("/fantasy.sna", FILE_READ);
     lhandle = SPIFFS.open("/sppong.sna", FILE_READ);
 //
-//  lhandle = SPIFFS.open("/manic.sna", FILE_READ);
+//    lhandle = SPIFFS.open("/manic.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/jsw1.sna", FILE_READ);
 //  lhandle = SPIFFS.open("/skooldz.sna", FILE_READ);
 
@@ -152,7 +151,7 @@ Z80_Regs i;
    uint16_t buf_p = 0;
     while (lhandle.available())
     {
-      bank1[buf_p] = lhandle.read();
+      bank0[buf_p] = lhandle.read();
       buf_p++;
     }
     lhandle.close();
@@ -162,12 +161,12 @@ Z80_Regs i;
 
     Serial.println("STACK:");
     for(int yy = 0;yy < 16;yy++)
-          Serial.println(bank1[thestack - 0x4000 + yy], HEX);
+          Serial.println(bank0[thestack - 0x4000 + yy], HEX);
 
 
 
     uint16_t offset = thestack - 0x4000;
-    uint16_t retaddr = bank1[offset]+0x100 * bank1[offset+1] ;
+    uint16_t retaddr = bank0[offset]+0x100 * bank0[offset+1] ;
     Serial.print("sp before");
     Serial.println((uint16_t) i.SP.D, HEX);
     i.SP.D++;
@@ -185,6 +184,8 @@ Z80_Regs i;
      
     
     Z80_SetRegs (&i);
+    Serial.printf("Free Heap after SNA: %d\n",system_get_free_heap_size());
+
   }
   else
   {

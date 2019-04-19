@@ -2322,7 +2322,7 @@ void Z80_Reset (void)
  memset (&R,0,sizeof(Z80_Regs));
  R.SP.D=0xF000;
  R.R=rand();
- Z80_ICount=Z80_IPeriod;
+ //Z80_ICount=Z80_IPeriod;
 }
 
 /****************************************************************************/

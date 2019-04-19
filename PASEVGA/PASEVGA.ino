@@ -47,16 +47,16 @@ void Z80_WRMEM(uint16_t A,byte V);
 extern byte bank_latch;
 extern int start_im1_irq;
 void measure_clock();
-void setup_cpuspeed(int per);
+void setup_cpuspeed();
 
 File myFile;
 
 // ________________________________________________________________________
 // GLOBALS
 //
+byte *bank0;
 byte *bank1;
 byte *bank2;
-byte *bank3;
 byte z80ports_in[32];
 byte borderTemp =7;
 byte flashing = 0;
@@ -99,12 +99,20 @@ void setup()
   
   // ALLOCATE MEMORY
   //
-  bank1 = (byte *)malloc(49152);
-  if(bank1 == NULL)Serial.println("Failed to allocate Bank 1 memory");
-
-  setup_cpuspeed(100);
+  bank0 = (byte *)malloc(49152);
+  if(bank0 == NULL)Serial.println("Failed to allocate Bank 1 memory");
+  Serial.printf("Free Heap after bank0: %d\n",system_get_free_heap_size());
+  
+  
+  
+  //bank1 = (byte *)malloc(49152);
+  //if(bank1 == NULL)Serial.println("Failed to allocate Bank 1 memory");
+  //Serial.printf("Free Heap after bank0: %d\n",system_get_free_heap_size());
+  
+  setup_cpuspeed();
+  
+  
   measure_clock();
-  delay(10000);
   
   // START Z80
   
@@ -119,9 +127,7 @@ void setup()
 
   Serial.print("Setup: MAIN Executing on core ");
   Serial.println(xPortGetCoreID());
-  Serial.print("Free Heap: ");
-  Serial.println(system_get_free_heap_size());
-
+  Serial.printf("Free Heap after Z80 Reset: %d\n",system_get_free_heap_size());
  
 xMutex = xSemaphoreCreateMutex();
   
@@ -171,8 +177,8 @@ void videoTask( void * parameter )
             //spectrum attributes
             //bit 7 6   5 4 3   2 1 0
             //    F B   P A P   I N K
-            color_attrib=bank1[0x1800+(calcY(byte_offset)/8)*32+ff];//get 1 of 768 attrib values
-            pixel_map=bank1[byte_offset];
+            color_attrib=bank0[0x1800+(calcY(byte_offset)/8)*32+ff];//get 1 of 768 attrib values
+            pixel_map=bank0[byte_offset];
             zx_fore_color=color_attrib & 0x07;
             zx_back_color=(color_attrib & 0x38)>>3;
 
@@ -265,7 +271,6 @@ void loop()
         //digitalWrite(DEBUG_PIN2,LOW);
         //xSemaphoreGive( xMutex );
         start_im1_irq=1;    // keyboard scan is run in IM1 interrupt
-        //delay(25);
         vTaskDelay(1) ;  //important to avoid task watchdog timeouts - change this to slow down emu
   } 
 }
