@@ -2,4 +2,5 @@
 
 void kb_begin();
 extern byte lastcode;
-extern bool keymap[];
+extern char keymap[];
+extern char oldKeymap[];

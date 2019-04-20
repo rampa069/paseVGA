@@ -15,6 +15,7 @@ bool shift_presed= false;
 bool symbol_pressed = false;
 byte rc = 0;
 byte keymap[256];
+byte oldKeymap[256];
 extern bool debug_keyboard;
 
 
@@ -75,47 +76,6 @@ void kb_interruptHandler(void)
 }
 
 
-
-void kb_interruptHandler1()
-{
-    
-    shift>>=1;
-    shift|=(digitalRead(KEYBOARD_DATA)<<9);
-    if(++rc==11)
-    {
-         
-            uint8_t data=(shift>>1)&0xff;
-            rc=0;
-            shift=0;
-            if (data != 240) {
-                 keymap[data] = 0;
-                 lastcode=data;                 
-                      
-            } else {
-              //for(int gg = 0;gg < 256;gg++)
-              //   keymap[gg] = 1;
-              keymap[lastcode]=1;
-              lastcode=0;
-            }
-           
-           if (1)
-           {        
-            Serial.print("Received keys: ");
-            for (int a=0;a<256;a++)
-            {
-              Serial.print(keymap[a]);
-              Serial.print(" ");
-            }
-            Serial.println("");
-            Serial.printf("Lastcode: %x\n",lastcode);      
-            Serial.printf("Data: %x\n",data); 
-        }
-    }
- 
-}
-
-
-
 void kb_begin()
 {
     pinMode(KEYBOARD_DATA,INPUT_PULLUP);
@@ -125,6 +85,7 @@ void kb_begin()
     attachInterrupt(digitalPinToInterrupt(KEYBOARD_CLK), kb_interruptHandler, FALLING);
     for(int gg = 0;gg < 256;gg++) {
       keymap[gg] = 1;
+      oldKeymap[gg] =1;
     }
     
 }

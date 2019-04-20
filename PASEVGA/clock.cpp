@@ -11,8 +11,8 @@ void Z80_WRMEM(uint16_t A,byte V);
 void Z80_GetRegs (Z80_Regs *Regs);
 extern int Z80_IPeriod;
 extern int Z80_ICount;
-int IFreq = 50;
-int CPUSpeed=550;
+int IFreq = 100;
+int CPUSpeed=500;
 
 
 void measure_clock()
@@ -33,7 +33,7 @@ void measure_clock()
   uint32_t ts2 = micros();
   tstates=Z80_ICount;
   Z80_GetRegs(&i);
-  Serial.printf("clock frequency = %5.3f Mhz\n", ((float) 12/(ts2-ts1)));
+  Serial.printf("clock frequency = %5.3f Mhz\n", ((float) tstates/(ts2-ts1)));
   
   Serial.printf("Measured time: %d\n",ts2-ts1);
   Serial.printf("T-States executed: %d\n",tstates);
@@ -42,7 +42,7 @@ void measure_clock()
 
 void setup_cpuspeed() {
    
-  Z80_IPeriod =Z80_IPeriod=(3579545*CPUSpeed)/(IFreq*1000);;
-  Z80_ICount = 100000;
+  Z80_IPeriod = 20000; //Z80_IPeriod=(3579545*CPUSpeed)/(IFreq*1000);;
+  Z80_ICount =  60000;
 
 }

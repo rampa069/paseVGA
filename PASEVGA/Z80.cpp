@@ -17,8 +17,8 @@
 
 #include "Z80.h"
 #include "paledefs.h"
-
 extern bool run_debug;
+extern void do_keyboard();
 
 #define M_RDMEM(A)      Z80_RDMEM(A)
 #define M_WRMEM(A,V)    Z80_WRMEM(A,V)
@@ -2511,7 +2511,7 @@ if(run_debug)
   (*(opcode_main[opcode]))();
   int retardo= cycles_main[opcode]*0.27 *2 ;
   
-  delayMicroseconds(3);
+  delayMicroseconds(4);
  }
  while (Z80_ICount>0);
  Z80_ICount+=Z80_IPeriod;
@@ -2524,8 +2524,12 @@ if(run_debug)
 /****************************************************************************/
 word Z80 (void)
 {
- while (Z80_Execute());
- return(R.PC.W.l);
+ while 
+ (Z80_Execute())
+ {
+  do_keyboard();
+  return(R.PC.W.l);
+ }
 }
 
 /****************************************************************************/

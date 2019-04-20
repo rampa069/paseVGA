@@ -21,7 +21,7 @@
 //
 //#define SD_ENABLED
 //#define DEBUG
-bool run_snapshot = false;
+bool run_snapshot = true;
 bool run_debug = false;
 
 
@@ -39,6 +39,7 @@ VGA3Bit vga;
 unsigned Z80_GetPC (void);         /* Get program counter                   */
 void Z80_Reset (void);             /* Reset registers to the initial values */
 unsigned int  Z80_Execute ();           /* Execute IPeriod T-States              */
+unsigned int  Z80 ();           /* Execute IPeriod T-States              */
 
 void pump_key(char k);
 
@@ -59,8 +60,9 @@ byte *bank1;
 byte *bank2;
 byte z80ports_in[32];
 byte borderTemp =7;
+byte soundTemp = 0;
 byte flashing = 0;
-
+byte lastAudio=0;
 
 // SETUP *************************************
 SemaphoreHandle_t xMutex;
@@ -94,7 +96,8 @@ void setup()
   digitalWrite(DEBUG_PIN,LOW);
   pinMode(DEBUG_PIN2,OUTPUT);
   digitalWrite(DEBUG_PIN2,LOW);
-   
+
+  start_im1_irq=1; 
   kb_begin();
   
   // ALLOCATE MEMORY
@@ -129,7 +132,7 @@ void setup()
   Serial.println(xPortGetCoreID());
   Serial.printf("Free Heap after Z80 Reset: %d\n",system_get_free_heap_size());
  
-xMutex = xSemaphoreCreateMutex();
+  xMutex = xSemaphoreCreateMutex();
   
   xTaskCreatePinnedToCore(
                       videoTask,   /* Function to implement the task */
@@ -139,6 +142,7 @@ xMutex = xSemaphoreCreateMutex();
                       20,          /* Priority of the task */
                       NULL,       /* Task handle. */
                       0);  /* Core where the task should run */
+  
   
   if (run_snapshot) 
      load_speccy();
@@ -162,7 +166,7 @@ void videoTask( void * parameter )
    
    while(1)
    {
-        xSemaphoreTake( xMutex, portMAX_DELAY );
+        //xSemaphoreTake( xMutex, portMAX_DELAY );
         //digitalWrite(DEBUG_PIN,HIGH);
         
         if (flashing++ > 20)
@@ -203,16 +207,20 @@ void videoTask( void * parameter )
                                vga.dotFast(zx_vidcalc+52, calcY(byte_offset)+5,zxcolor(zx_fore_color,bright)) ;          
                 else
                                vga.dotFast(zx_vidcalc+52, calcY(byte_offset)+5,zxcolor(zx_back_color,bright)) ;          
-    
+                             
             }
           }
         }
          vga.show(); 
         //digitalWrite(DEBUG_PIN,LOW);
-        xSemaphoreGive( xMutex ); 
+        
+        //xSemaphoreGive( xMutex ); 
         vTaskDelay(1) ;
      }
 }
+
+
+
       
 // SPECTRUM SCREEN DISPLAY
 //
@@ -264,10 +272,12 @@ void loop()
 {
   while (1) 
   { 
-        do_keyboard();
+        //do_keyboard();
         //xSemaphoreTake( xMutex, portMAX_DELAY );
         //digitalWrite(DEBUG_PIN2,HIGH);
-             Z80_Execute();
+             //Z80_Execute();
+         
+         Z80();
         //digitalWrite(DEBUG_PIN2,LOW);
         //xSemaphoreGive( xMutex );
         start_im1_irq=1;    // keyboard scan is run in IM1 interrupt
@@ -279,53 +289,57 @@ void loop()
 void do_keyboard()
 {
     
-    bitWrite(z80ports_in[0], 0, keymap[0x12]);
-    bitWrite(z80ports_in[0], 1, keymap[0x1a]);
-    bitWrite(z80ports_in[0], 2, keymap[0x22]);
-    bitWrite(z80ports_in[0], 3, keymap[0x21]);
-    bitWrite(z80ports_in[0], 4, keymap[0x2a]);
+    if (keymap != oldKeymap)
+    {
+      bitWrite(z80ports_in[0], 0, keymap[0x12]);
+      bitWrite(z80ports_in[0], 1, keymap[0x1a]);
+      bitWrite(z80ports_in[0], 2, keymap[0x22]);
+      bitWrite(z80ports_in[0], 3, keymap[0x21]);
+      bitWrite(z80ports_in[0], 4, keymap[0x2a]);
 
-    bitWrite(z80ports_in[1], 0, keymap[0x1c]);
-    bitWrite(z80ports_in[1], 1, keymap[0x1b]);
-    bitWrite(z80ports_in[1], 2, keymap[0x23]);
-    bitWrite(z80ports_in[1], 3, keymap[0x2b]);
-    bitWrite(z80ports_in[1], 4, keymap[0x34]);
+      bitWrite(z80ports_in[1], 0, keymap[0x1c]);
+      bitWrite(z80ports_in[1], 1, keymap[0x1b]);
+      bitWrite(z80ports_in[1], 2, keymap[0x23]);
+      bitWrite(z80ports_in[1], 3, keymap[0x2b]);
+      bitWrite(z80ports_in[1], 4, keymap[0x34]);
 
-    bitWrite(z80ports_in[2], 0, keymap[0x15]);
-    bitWrite(z80ports_in[2], 1, keymap[0x1d]);
-    bitWrite(z80ports_in[2], 2, keymap[0x24]);
-    bitWrite(z80ports_in[2], 3, keymap[0x2d]);
-    bitWrite(z80ports_in[2], 4, keymap[0x2c]);
+      bitWrite(z80ports_in[2], 0, keymap[0x15]);
+      bitWrite(z80ports_in[2], 1, keymap[0x1d]);
+      bitWrite(z80ports_in[2], 2, keymap[0x24]);
+      bitWrite(z80ports_in[2], 3, keymap[0x2d]);
+      bitWrite(z80ports_in[2], 4, keymap[0x2c]);
 
-    bitWrite(z80ports_in[3], 0, keymap[0x16]);
-    bitWrite(z80ports_in[3], 1, keymap[0x1e]);
-    bitWrite(z80ports_in[3], 2, keymap[0x26]);
-    bitWrite(z80ports_in[3], 3, keymap[0x25]);
-    bitWrite(z80ports_in[3], 4, keymap[0x2e]);
+      bitWrite(z80ports_in[3], 0, keymap[0x16]);
+      bitWrite(z80ports_in[3], 1, keymap[0x1e]);
+      bitWrite(z80ports_in[3], 2, keymap[0x26]);
+      bitWrite(z80ports_in[3], 3, keymap[0x25]);
+      bitWrite(z80ports_in[3], 4, keymap[0x2e]);
     
-    bitWrite(z80ports_in[4], 0, keymap[0x45]);
-    bitWrite(z80ports_in[4], 1, keymap[0x46]);
-    bitWrite(z80ports_in[4], 2, keymap[0x3e]);
-    bitWrite(z80ports_in[4], 3, keymap[0x3d]);
-    bitWrite(z80ports_in[4], 4, keymap[0x36]);
+      bitWrite(z80ports_in[4], 0, keymap[0x45]);
+      bitWrite(z80ports_in[4], 1, keymap[0x46]);
+      bitWrite(z80ports_in[4], 2, keymap[0x3e]);
+      bitWrite(z80ports_in[4], 3, keymap[0x3d]);
+      bitWrite(z80ports_in[4], 4, keymap[0x36]);
     
-    bitWrite(z80ports_in[5], 0, keymap[0x4d]);
-    bitWrite(z80ports_in[5], 1, keymap[0x44]);
-    bitWrite(z80ports_in[5], 2, keymap[0x43]);
-    bitWrite(z80ports_in[5], 3, keymap[0x3c]);
-    bitWrite(z80ports_in[5], 4, keymap[0x35]);
+      bitWrite(z80ports_in[5], 0, keymap[0x4d]);
+      bitWrite(z80ports_in[5], 1, keymap[0x44]);
+      bitWrite(z80ports_in[5], 2, keymap[0x43]);
+      bitWrite(z80ports_in[5], 3, keymap[0x3c]);
+      bitWrite(z80ports_in[5], 4, keymap[0x35]);
     
-    bitWrite(z80ports_in[6], 0, keymap[0x5a]);
-    bitWrite(z80ports_in[6], 1, keymap[0x4b]);
-    bitWrite(z80ports_in[6], 2, keymap[0x42]);
-    bitWrite(z80ports_in[6], 3, keymap[0x3b]);
-    bitWrite(z80ports_in[6], 4, keymap[0x33]);
+      bitWrite(z80ports_in[6], 0, keymap[0x5a]);
+      bitWrite(z80ports_in[6], 1, keymap[0x4b]);
+      bitWrite(z80ports_in[6], 2, keymap[0x42]);
+      bitWrite(z80ports_in[6], 3, keymap[0x3b]);
+      bitWrite(z80ports_in[6], 4, keymap[0x33]);
     
-    bitWrite(z80ports_in[7], 0, keymap[0x29]);
-    bitWrite(z80ports_in[7], 1, keymap[0x14]);
-    bitWrite(z80ports_in[7], 2, keymap[0x3a]);
-    bitWrite(z80ports_in[7], 3, keymap[0x31]);
-    bitWrite(z80ports_in[7], 4, keymap[0x32]);  
+      bitWrite(z80ports_in[7], 0, keymap[0x29]);
+      bitWrite(z80ports_in[7], 1, keymap[0x14]);
+      bitWrite(z80ports_in[7], 2, keymap[0x3a]);
+      bitWrite(z80ports_in[7], 3, keymap[0x31]);
+      bitWrite(z80ports_in[7], 4, keymap[0x32]);  
+    }
+    strcpy(oldKeymap,keymap);
     
     
 }

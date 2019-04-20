@@ -22,13 +22,21 @@
 extern byte z80ports_in[32];
 extern byte *bank0;
 extern byte borderTemp;
-
+extern byte soundTemp;
 int start_im1_irq=0;
 int start_ss_nmi=0;
 int break_nmi=0;
 
 
-
+void fastWrite(byte port,byte value)
+{
+  
+  if (value > 0)
+     REG_WRITE(GPIO_OUT_W1TS_REG, BIT5);
+  else     
+     REG_WRITE(GPIO_OUT_W1TC_REG, BIT5);
+     
+}
 
 unsigned char testbit(char inbyt,int testbi)
 {
@@ -86,7 +94,7 @@ void Z80_Out (uint16_t Port,byte Value)
       bitWrite(borderTemp,2,bitRead(Value,2));
 
       digitalWrite(SOUND_PIN,bitRead(Value,4));
-           
+      fastWrite(SOUND_PIN,testbit(Value,4));     
       break;
     }
   }
@@ -221,31 +229,3 @@ void Z80_Retn (void)
 /* can be used to slightly speed up emulation                               */
 /****************************************************************************/
 #define Z80_WRSTACK(A,V)  Z80_WRMEM(A,V)
-
-
-//byte theRAM[16384];
-
-
-//uint8 ICACHE_RODATA_ATTR 
-
-
-//uint8 ICACHE_RODATA_ATTR data[] = {
-//    0,1,2,3,4,5,6,7,
-//    8,9,10,11,12,13,14,15
-//};
-// 
-//uint16 ICACHE_RODATA_ATTR data16[] = {
-//    300,600,900,1200
-//};
-// 
-//uint8 ICACHE_FLASH_ATTR read_rom_uint8(const uint8* addr){
-//    uint32 bytes;
-//    bytes = *(uint32*)((uint32)addr & ~3);
-//    return ((uint8*)&bytes)[(uint32)addr & 3];
-//}
-// 
-//uint16 read_rom_uint16(const uint16* addr){
-//    uint32 bytes;
-//    bytes = *(uint32*)((uint32)addr & ~3);
-//    return ((uint16*)&bytes)[((uint32)addr >> 1) & 1];
-//}
